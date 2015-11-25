@@ -5,7 +5,6 @@ class Route
 
   def initialize(pattern, http_method, controller_class, action_name)
       @pattern, @http_method, @controller_class, @action_name = pattern, http_method, controller_class, action_name
-
   end
 
   # checks if pattern matches path and method matches request method
@@ -13,11 +12,6 @@ class Route
     path = req.path
     method = req.request_method
     regex = Regexp.new(@pattern)
-    p " "
-    p "--my req: htttp: #{method}, path: #{path}"
-    p "--sample: htttp: #{http_method}, regex: #{regex}"
-    p "method: #{http_method == method.downcase.to_sym}"
-    p "regex: #{@pattern =~ (path)}"
     return true if regex =~ path && http_method == method.downcase.to_sym
     false
   end
@@ -27,13 +21,14 @@ class Route
   def run(req, res)
     regex = Regexp.new(@pattern)
     path = req.path
+
     match_data = regex.match(path)
     route_params = {}
     match_data.names.each do |name|
       route_params[name] = match_data[name]
     end
     my_controller = @controller_class.new(req, res, route_params)
-    # p my_controller
+
     my_controller.invoke_action(@action_name)
   end
 end
@@ -79,7 +74,7 @@ class Router
     # p "\n\n\n ----My Route method: #{req.request_method} path: #{req.path}"
     route = match(req)
     if route
-      route.run
+      route.run(req, res)
     else
       res.status = 404
     end

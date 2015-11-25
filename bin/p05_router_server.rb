@@ -31,10 +31,14 @@ class Cats2Controller < ControllerBase
 end
 
 router = Router.new
-router.draw do
-  get Regexp.new("^/cats$"), Cats2Controller, :index
-  get Regexp.new("^/cats/(?<cat_id>\\d+)/statuses$"), StatusesController, :index
-end
+
+router.add_route(Regexp.new("^/cats$"), :get, Cats2Controller, :index)
+router.add_route(("^/cats/(?<cat_id>\\d+)/statuses$"), :get, StatusesController, :index)
+
+# router.draw do
+#   get Regexp.new("^/cats$"), Cats2Controller, :index
+#   get Regexp.new("^/cats/(?<cat_id>\\d+)/statuses$"), StatusesController, :index
+# end
 
 app = Proc.new do |env|
   req = Rack::Request.new(env)
@@ -44,6 +48,6 @@ app = Proc.new do |env|
 end
 
 Rack::Server.start(
- app: app, 
+ app: app,
  Port: 3000
 )
