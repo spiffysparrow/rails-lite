@@ -10,6 +10,7 @@ class ControllerBase
   def initialize(req, res, route_params = {})
     @req = req
     @res = res
+    @params = req.params.merge(route_params)
     @already_built_response = false
   end
 
@@ -63,5 +64,6 @@ class ControllerBase
 
   # use this with the router to call action_name (:index, :show, :create...)
   def invoke_action(name)
+    self.send(name.to_sym)
   end
 end
