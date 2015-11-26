@@ -24,15 +24,36 @@ class StatusesController < ControllerBase
   end
 end
 
-class Cats2Controller < ControllerBase
+class CatsController < ControllerBase
   def index
-    render_content($cats.to_s, "text/text")
+    @cats = $cats
+    # render_content($cats.to_s, "text/text")
+  end
+  def new
+    @cat = {owner: nil, name: nil}
+  end
+
+  def create
+    @cat = {owner: nil, name: nil}
+    @cat = {owenr: @params["cat"]["owner"], name: @params["cat"]["name"]}
+
+    # render_content(@cat.to_json, "text/html")
+    if @cat.values.include?("")
+      flash.now(:errors, "Fill out all values")
+      render :new
+    else
+      flash["messages"] = "Stored your cat!"
+      $cats << @cat
+      redirect_to("/cats")
+    end
   end
 end
 
 router = Router.new
 
-router.add_route(Regexp.new("^/cats$"), :get, Cats2Controller, :index)
+router.add_route(Regexp.new("^/cats$"), :get, CatsController, :index)
+router.add_route(Regexp.new("^/cats/new$"), :get, CatsController, :new)
+router.add_route(Regexp.new("^/cats$"), :post, CatsController, :create)
 router.add_route(("^/cats/(?<cat_id>\\d+)/statuses$"), :get, StatusesController, :index)
 
 # router.draw do
